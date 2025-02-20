@@ -19,6 +19,8 @@
 
 > Рекомендуется в командах использовать путь к диску `permanent device path`, он сохранится при изменении конфигурации оборудования
 
+![screenshot](https://github.com/flarens/HDDWinCmd/blob/main/screenshot.png)
+
 ## Структура команд:
 
     --command parameter1 parameter2 ... --command "parameter one" ...

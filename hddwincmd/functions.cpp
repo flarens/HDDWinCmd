@@ -7,14 +7,14 @@
 #include "disk_info.h"
 
 
-// выводит весь текст если response_type = text
+// РІС‹РІРѕРґРёС‚ РІРµСЃСЊ С‚РµРєСЃС‚ РµСЃР»Рё response_type = text
 void WcoutExt_Mini(const std::wstring& txt, s_resp& resp, const bool success) {
 	if (resp.type > 1) std::wcout << txt;
 	if (!success) resp.successAll = false;
 }
 
 
-// выводит текст при response_type = 2, выводит success/failure при response_type = 1
+// РІС‹РІРѕРґРёС‚ С‚РµРєСЃС‚ РїСЂРё response_type = 2, РІС‹РІРѕРґРёС‚ success/failure РїСЂРё response_type = 1
 void WcoutExt(const std::wstring& txt, s_resp& resp, const bool success) {
 	if (resp.type == 1) {
 		if (success) std::wcout << L"success" << std::endl;
@@ -25,14 +25,14 @@ void WcoutExt(const std::wstring& txt, s_resp& resp, const bool success) {
 }
 
 
-// проверка - строка только из цифр
+// РїСЂРѕРІРµСЂРєР° - СЃС‚СЂРѕРєР° С‚РѕР»СЊРєРѕ РёР· С†РёС„СЂ
 bool IsDigitsOnly(const std::wstring& str) {
-	// нулевая длина
+	// РЅСѓР»РµРІР°СЏ РґР»РёРЅР°
 	if (str.size() == 0)
 		return false;
 
 	for (wchar_t ch : str) {
-		if (!iswdigit(ch)) { // является ли символ цифрой
+		if (!iswdigit(ch)) { // СЏРІР»СЏРµС‚СЃСЏ Р»Рё СЃРёРјРІРѕР» С†РёС„СЂРѕР№
 			return false;
 		}
 	}
@@ -40,19 +40,19 @@ bool IsDigitsOnly(const std::wstring& str) {
 }
 
 
-// проверка - строка вида /dev/sda
+// РїСЂРѕРІРµСЂРєР° - СЃС‚СЂРѕРєР° РІРёРґР° /dev/sda
 bool IsLinuxDriveFormat(const std::wstring& str) {
-	// длиннее "/dev/sd"
+	// РґР»РёРЅРЅРµРµ "/dev/sd"
 	if (str.size() < 8)
 		return false;
 
-	// начинается с "/dev/sd"
+	// РЅР°С‡РёРЅР°РµС‚СЃСЏ СЃ "/dev/sd"
 	const std::wstring prefix = L"/dev/sd";
 	if (str.compare(0, prefix.size(), prefix) != 0) {
 		return false;
 	}
 
-	// оставшаяся часть строки состоит только из латинских букв a-z
+	// РѕСЃС‚Р°РІС€Р°СЏСЃСЏ С‡Р°СЃС‚СЊ СЃС‚СЂРѕРєРё СЃРѕСЃС‚РѕРёС‚ С‚РѕР»СЊРєРѕ РёР· Р»Р°С‚РёРЅСЃРєРёС… Р±СѓРєРІ a-z
 	for (size_t i = prefix.size(); i < str.size(); ++i) {
 		if (!std::islower(str[i]) || str[i] < L'a' || str[i] > L'z') {
 			return false;
@@ -63,9 +63,9 @@ bool IsLinuxDriveFormat(const std::wstring& str) {
 }
 
 
-// проверка - одна латинская буква
+// РїСЂРѕРІРµСЂРєР° - РѕРґРЅР° Р»Р°С‚РёРЅСЃРєР°СЏ Р±СѓРєРІР°
 bool IsOneLetter(const std::wstring& str) {
-	// 1 символ
+	// 1 СЃРёРјРІРѕР»
 	if (str.size() != 1)
 		return false;
 
@@ -77,19 +77,19 @@ bool IsOneLetter(const std::wstring& str) {
 }
 
 
-// проверка - строка вида volume GUID
+// РїСЂРѕРІРµСЂРєР° - СЃС‚СЂРѕРєР° РІРёРґР° volume GUID
 bool IsVolumeGUID(const std::wstring& str) {
-	// длина со слешем или без "\\?\Volume{248f64f0-56e5-11ee-bfcd-00e04caa0bd0}\"
+	// РґР»РёРЅР° СЃРѕ СЃР»РµС€РµРј РёР»Рё Р±РµР· "\\?\Volume{248f64f0-56e5-11ee-bfcd-00e04caa0bd0}\"
 	if (str.size() < 48 || str.size() > 49)
 		return false;
 
-	// начинается с "\\?\Volume{"
+	// РЅР°С‡РёРЅР°РµС‚СЃСЏ СЃ "\\?\Volume{"
 	const std::wstring prefix = L"\\\\?\\Volume{";
 	if (str.compare(0, prefix.size(), prefix) != 0) {
 		return false;
 	}
 
-	// скобка закрывающая
+	// СЃРєРѕР±РєР° Р·Р°РєСЂС‹РІР°СЋС‰Р°СЏ
 	if (str[47] != L'}')
 		return false;
 
@@ -97,7 +97,7 @@ bool IsVolumeGUID(const std::wstring& str) {
 }
 
 
-// строка в многобайтовую строку
+// СЃС‚СЂРѕРєР° РІ РјРЅРѕРіРѕР±Р°Р№С‚РѕРІСѓСЋ СЃС‚СЂРѕРєСѓ
 std::wstring StringToWstring(const char* str) {
 	return std::wstring(str, str + std::strlen(str));
 }
@@ -108,7 +108,7 @@ std::wstring StringToWstring(const std::string& str) {
 }
 
 
-// преобразовать число в буквенное представление изчисления дисков Linux
+// РїСЂРµРѕР±СЂР°Р·РѕРІР°С‚СЊ С‡РёСЃР»Рѕ РІ Р±СѓРєРІРµРЅРЅРѕРµ РїСЂРµРґСЃС‚Р°РІР»РµРЅРёРµ РёР·С‡РёСЃР»РµРЅРёСЏ РґРёСЃРєРѕРІ Linux
 std::wstring NumberTolinuxDriveLetters(int num) {
 	std::wstring result = L"";
 	while (num >= 0) {
@@ -119,7 +119,7 @@ std::wstring NumberTolinuxDriveLetters(int num) {
 }
 
 
-// преобразование последовательности букв Linux диска в число
+// РїСЂРµРѕР±СЂР°Р·РѕРІР°РЅРёРµ РїРѕСЃР»РµРґРѕРІР°С‚РµР»СЊРЅРѕСЃС‚Рё Р±СѓРєРІ Linux РґРёСЃРєР° РІ С‡РёСЃР»Рѕ
 std::wstring LinuxDriveLettersToNumber(const std::wstring& input) {
 	int result = 0;
 	for (size_t i = 7; i < input.size(); ++i) {
@@ -129,7 +129,7 @@ std::wstring LinuxDriveLettersToNumber(const std::wstring& input) {
 }
 
 
-// конвертировать GUID в строку
+// РєРѕРЅРІРµСЂС‚РёСЂРѕРІР°С‚СЊ GUID РІ СЃС‚СЂРѕРєСѓ
 std::wstring GUIDtoString(const GUID& guid) {
 	wchar_t guidString[39];
 	if (StringFromGUID2(guid, guidString, sizeof(guidString) / sizeof(wchar_t)))
@@ -139,20 +139,20 @@ std::wstring GUIDtoString(const GUID& guid) {
 }
 
 
-// получить номер физического диска по volume GUID одного из его логических дисков
+// РїРѕР»СѓС‡РёС‚СЊ РЅРѕРјРµСЂ С„РёР·РёС‡РµСЃРєРѕРіРѕ РґРёСЃРєР° РїРѕ volume GUID РѕРґРЅРѕРіРѕ РёР· РµРіРѕ Р»РѕРіРёС‡РµСЃРєРёС… РґРёСЃРєРѕРІ
 int GetPhysicalDriveFromVolumeGUID(std::wstring volumePathName) {
 
-	// уберем слеш с конца если есть
+	// СѓР±РµСЂРµРј СЃР»РµС€ СЃ РєРѕРЅС†Р° РµСЃР»Рё РµСЃС‚СЊ
 	size_t len = volumePathName.size();
 	if (len > 0 && volumePathName[len - 1] == L'\\') volumePathName[len - 1] = L'\0';
 
-	// откроем том
+	// РѕС‚РєСЂРѕРµРј С‚РѕРј
 	HANDLE hVolume = CreateFile(volumePathName.c_str(), 0, FILE_SHARE_READ | FILE_SHARE_WRITE, NULL, OPEN_EXISTING, 0, NULL);
 	if (hVolume == INVALID_HANDLE_VALUE) {
 		return -1;
 	}
 
-	// получим инфу
+	// РїРѕР»СѓС‡РёРј РёРЅС„Сѓ
 	VOLUME_DISK_EXTENTS volumeDiskExtents;
 	DWORD bytesReturned;
 	if (!DeviceIoControl(hVolume, IOCTL_VOLUME_GET_VOLUME_DISK_EXTENTS, NULL, 0, &volumeDiskExtents, sizeof(volumeDiskExtents), &bytesReturned, NULL)) {
@@ -170,17 +170,17 @@ int GetPhysicalDriveFromVolumeGUID(std::wstring volumePathName) {
 }
 
 
-// распознать введенный drive
+// СЂР°СЃРїРѕР·РЅР°С‚СЊ РІРІРµРґРµРЅРЅС‹Р№ drive
 std::wstring GetPhysicalDriveFromDriveStr(const std::wstring& drive) {
-	// передано число
+	// РїРµСЂРµРґР°РЅРѕ С‡РёСЃР»Рѕ
 	if (IsDigitsOnly(drive)) {
 		return L"\\\\.\\PhysicalDrive" + drive;
 	}
-	// linux формат
+	// linux С„РѕСЂРјР°С‚
 	else if (IsLinuxDriveFormat(drive)) {
 		return L"\\\\.\\PhysicalDrive" + LinuxDriveLettersToNumber(drive);
 	}
-	// буква тома
+	// Р±СѓРєРІР° С‚РѕРјР°
 	else if (IsOneLetter(drive)) {
 		int deviceNumber;
 		deviceNumber = GetPhysicalDriveFromVolumeGUID(GetVolumeGUIDFromDriveLetter(drive));
@@ -199,7 +199,7 @@ std::wstring GetPhysicalDriveFromDriveStr(const std::wstring& drive) {
 }
 
 
-// получение номера диска
+// РїРѕР»СѓС‡РµРЅРёРµ РЅРѕРјРµСЂР° РґРёСЃРєР°
 int GetDriveNumber(const HANDLE& hDrive) {
 	STORAGE_DEVICE_NUMBER deviceNumber;
 	DWORD bytesReturned = 0;
@@ -221,7 +221,7 @@ int GetDriveNumber(const HANDLE& hDrive) {
 }
 
 
-// конвертировать кол-во байт в удобочитаемый вид
+// РєРѕРЅРІРµСЂС‚РёСЂРѕРІР°С‚СЊ РєРѕР»-РІРѕ Р±Р°Р№С‚ РІ СѓРґРѕР±РѕС‡РёС‚Р°РµРјС‹Р№ РІРёРґ
 std::wstring BytesToFormatString(long long bytes) {
 	const wchar_t* suffixes[] = { L"B", L"KB", L"MB", L"GB", L"TB", L"PB", L"EB" };
 	int suffixIndex = 0;
@@ -240,14 +240,14 @@ std::wstring BytesToFormatString(long long bytes) {
 }
 
 
-// код последней ошибки с расшифровкой
+// РєРѕРґ РїРѕСЃР»РµРґРЅРµР№ РѕС€РёР±РєРё СЃ СЂР°СЃС€РёС„СЂРѕРІРєРѕР№
 std::wstring GetLastErrorString() {
 	wchar_t buf[256];
 	FormatMessageW(FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS,
-		NULL, GetLastError(), MAKELANGID(LANG_ENGLISH, SUBLANG_ENGLISH_US),		// MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT) - для языка системы (русский для русских)
+		NULL, GetLastError(), MAKELANGID(LANG_ENGLISH, SUBLANG_ENGLISH_US),		// MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT) - РґР»СЏ СЏР·С‹РєР° СЃРёСЃС‚РµРјС‹ (СЂСѓСЃСЃРєРёР№ РґР»СЏ СЂСѓСЃСЃРєРёС…)
 		buf, (sizeof(buf) / sizeof(wchar_t)), NULL);
 
-	// удаление перевода строки, если он есть
+	// СѓРґР°Р»РµРЅРёРµ РїРµСЂРµРІРѕРґР° СЃС‚СЂРѕРєРё, РµСЃР»Рё РѕРЅ РµСЃС‚СЊ
 	size_t len = wcslen(buf);
 	if (len > 0 && buf[len - 1] == L'\n') {
 		buf[len - 1] = L'\0';
@@ -260,7 +260,7 @@ std::wstring GetLastErrorString() {
 }
 
 
-// открыть диск
+// РѕС‚РєСЂС‹С‚СЊ РґРёСЃРє
 bool OpenDevice(HANDLE& hDevice, const std::wstring& devicePath, s_resp& resp) {
 	hDevice = CreateFileW(
 		devicePath.c_str(),

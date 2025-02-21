@@ -1,6 +1,6 @@
 #include <windows.h>
 
-// версию также обновлять в help.h
+// РІРµСЂСЃРёСЋ С‚Р°РєР¶Рµ РѕР±РЅРѕРІР»СЏС‚СЊ РІ help.h
 #define FILEVERSION_MAJOR 0
 #define FILEVERSION_MINOR 1
 

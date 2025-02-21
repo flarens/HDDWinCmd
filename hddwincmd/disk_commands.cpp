@@ -9,9 +9,9 @@
 #pragma comment(lib, "setupapi.lib")
 
 
-// проверить принадлежит ли логический том (по его букве) к указанному номеру диска
+// РїСЂРѕРІРµСЂРёС‚СЊ РїСЂРёРЅР°РґР»РµР¶РёС‚ Р»Рё Р»РѕРіРёС‡РµСЃРєРёР№ С‚РѕРј (РїРѕ РµРіРѕ Р±СѓРєРІРµ) Рє СѓРєР°Р·Р°РЅРЅРѕРјСѓ РЅРѕРјРµСЂСѓ РґРёСЃРєР°
 int CheckVolumeLetterOnDiskNumber(const wchar_t volumeLetter, const int deviceNumber, s_resp& resp) {
-	// открываем логический том
+	// РѕС‚РєСЂС‹РІР°РµРј Р»РѕРіРёС‡РµСЃРєРёР№ С‚РѕРј
 	std::wstring volumePath = L"\\\\.\\";
 	volumePath += volumeLetter;
 	volumePath += L":";
@@ -21,7 +21,7 @@ int CheckVolumeLetterOnDiskNumber(const wchar_t volumeLetter, const int deviceNu
 		return -1;
 	}
 
-	// запрос информации
+	// Р·Р°РїСЂРѕСЃ РёРЅС„РѕСЂРјР°С†РёРё
 	DWORD bytesReturned;
 	VOLUME_DISK_EXTENTS diskExtents;
 	if (!DeviceIoControl(hVolume, IOCTL_VOLUME_GET_VOLUME_DISK_EXTENTS, nullptr, 0, &diskExtents, sizeof(diskExtents), &bytesReturned, nullptr)) {
@@ -30,10 +30,10 @@ int CheckVolumeLetterOnDiskNumber(const wchar_t volumeLetter, const int deviceNu
 		return -1;
 	}
 
-	// перебираем все физические диски, на которых находится логический том
+	// РїРµСЂРµР±РёСЂР°РµРј РІСЃРµ С„РёР·РёС‡РµСЃРєРёРµ РґРёСЃРєРё, РЅР° РєРѕС‚РѕСЂС‹С… РЅР°С…РѕРґРёС‚СЃСЏ Р»РѕРіРёС‡РµСЃРєРёР№ С‚РѕРј
 	for (DWORD i = 0; i < diskExtents.NumberOfDiskExtents; ++i) {
 		DISK_EXTENT& extent = diskExtents.Extents[i];
-		// номер выбранного диска совпадает с системным - он системный
+		// РЅРѕРјРµСЂ РІС‹Р±СЂР°РЅРЅРѕРіРѕ РґРёСЃРєР° СЃРѕРІРїР°РґР°РµС‚ СЃ СЃРёСЃС‚РµРјРЅС‹Рј - РѕРЅ СЃРёСЃС‚РµРјРЅС‹Р№
 		if (extent.DiskNumber == deviceNumber) {
 			CloseHandle(hVolume);
 			return 1;
@@ -45,7 +45,7 @@ int CheckVolumeLetterOnDiskNumber(const wchar_t volumeLetter, const int deviceNu
 }
 
 
-// получить буквы всех дисков, содержащих файл подкачки
+// РїРѕР»СѓС‡РёС‚СЊ Р±СѓРєРІС‹ РІСЃРµС… РґРёСЃРєРѕРІ, СЃРѕРґРµСЂР¶Р°С‰РёС… С„Р°Р№Р» РїРѕРґРєР°С‡РєРё
 bool GetVolumeLettersContainingSwapFile(std::wstring& letters, s_resp& resp) {
 	HKEY hKey;
 	if (RegOpenKeyExW(HKEY_LOCAL_MACHINE, L"SYSTEM\\CurrentControlSet\\Control\\Session Manager\\Memory Management", 0, KEY_READ, &hKey) != ERROR_SUCCESS) {
@@ -71,7 +71,7 @@ bool GetVolumeLettersContainingSwapFile(std::wstring& letters, s_resp& resp) {
 	wchar_t* current = buffer;
 	letters = L"";
 	while (*current) {
-		// путь вида \??\C:\pagefile.sys
+		// РїСѓС‚СЊ РІРёРґР° \??\C:\pagefile.sys
 		if (current[0] == L'\\' && current[1] == L'?' && current[2] == L'?' && current[3] == L'\\' && current[5] == L':') {
 			letters += current[4];
 		}
@@ -84,27 +84,27 @@ bool GetVolumeLettersContainingSwapFile(std::wstring& letters, s_resp& resp) {
 }
 
 
-// проверка диска на наличие системных файлов
+// РїСЂРѕРІРµСЂРєР° РґРёСЃРєР° РЅР° РЅР°Р»РёС‡РёРµ СЃРёСЃС‚РµРјРЅС‹С… С„Р°Р№Р»РѕРІ
 bool IsNotSystemDisk(const HANDLE hDevice, s_resp& resp) {
 
-	// получаем номер выбранного диска
+	// РїРѕР»СѓС‡Р°РµРј РЅРѕРјРµСЂ РІС‹Р±СЂР°РЅРЅРѕРіРѕ РґРёСЃРєР°
 	int driveNumber = GetDriveNumber(hDevice);
 	if (driveNumber < 0) {
 		WcoutExt(L"Failed to get disk number. " + GetLastErrorString() + L"\r\n", resp, false);
 		return false;
 	}
 
-	// получаем системную директорию
+	// РїРѕР»СѓС‡Р°РµРј СЃРёСЃС‚РµРјРЅСѓСЋ РґРёСЂРµРєС‚РѕСЂРёСЋ
 	wchar_t systemPath[MAX_PATH];
 	if (!GetWindowsDirectoryW(systemPath, MAX_PATH)) {
 		WcoutExt(L"Failed to get system directory. " + GetLastErrorString() + L"\r\n", resp, false);
 		return false;
 	}
 
-	// извлекаем букву системного тома
+	// РёР·РІР»РµРєР°РµРј Р±СѓРєРІСѓ СЃРёСЃС‚РµРјРЅРѕРіРѕ С‚РѕРјР°
 	wchar_t systemVolumeLetter = systemPath[0];
 
-	// проверка
+	// РїСЂРѕРІРµСЂРєР°
 	int result = CheckVolumeLetterOnDiskNumber(systemVolumeLetter, driveNumber, resp);
 	if (result < 0) {
 		return false;
@@ -113,13 +113,13 @@ bool IsNotSystemDisk(const HANDLE hDevice, s_resp& resp) {
 		return false;
 	}
 
-	// получаем тома, содержащие файл подкачки
+	// РїРѕР»СѓС‡Р°РµРј С‚РѕРјР°, СЃРѕРґРµСЂР¶Р°С‰РёРµ С„Р°Р№Р» РїРѕРґРєР°С‡РєРё
 	std::wstring volumeLetters;
 	if (!GetVolumeLettersContainingSwapFile(volumeLetters, resp)) {
 		return false;
 	}
 
-	// проверяем все
+	// РїСЂРѕРІРµСЂСЏРµРј РІСЃРµ
 	size_t len = volumeLetters.size();
 	if (len > 0) {
 		for (size_t i = 0; i < len; ++i) {
@@ -138,14 +138,14 @@ bool IsNotSystemDisk(const HANDLE hDevice, s_resp& resp) {
 }
 
 
-// синхронизировать кэш диска
+// СЃРёРЅС…СЂРѕРЅРёР·РёСЂРѕРІР°С‚СЊ РєСЌС€ РґРёСЃРєР°
 bool SendSynchronizeCache(const HANDLE hDevice) {
 	SCSI_PASS_THROUGH spt = { 0 };
 	spt.Length = sizeof(SCSI_PASS_THROUGH);
-	spt.CdbLength = 10; // SYNCHRONIZE CACHE использует 10-byte CDB
+	spt.CdbLength = 10; // SYNCHRONIZE CACHE РёСЃРїРѕР»СЊР·СѓРµС‚ 10-byte CDB
 	spt.DataIn = SCSI_IOCTL_DATA_UNSPECIFIED;
-	spt.TimeOutValue = 30; // таймаут для синхронизации в секундах
-	spt.Cdb[0] = 0x35; // SYNCHRONIZE CACHE команда
+	spt.TimeOutValue = 30; // С‚Р°Р№РјР°СѓС‚ РґР»СЏ СЃРёРЅС…СЂРѕРЅРёР·Р°С†РёРё РІ СЃРµРєСѓРЅРґР°С…
+	spt.Cdb[0] = 0x35; // SYNCHRONIZE CACHE РєРѕРјР°РЅРґР°
 
 	DWORD returned = 0;
 
@@ -165,7 +165,7 @@ bool SendSynchronizeCache(const HANDLE hDevice) {
 }
 
 
-// ожидание завершения операций с диском
+// РѕР¶РёРґР°РЅРёРµ Р·Р°РІРµСЂС€РµРЅРёСЏ РѕРїРµСЂР°С†РёР№ СЃ РґРёСЃРєРѕРј
 bool WaitDiskActivity(const HANDLE hDevice, const DWORD timeout, s_resp& resp) {
 	DISK_PERFORMANCE diskPerformance = { 0 };
 	DWORD bytesReturned = 0;
@@ -187,23 +187,23 @@ bool WaitDiskActivity(const HANDLE hDevice, const DWORD timeout, s_resp& resp) {
 			&bytesReturned,
 			NULL)) {
 
-			// номер итерации, на которой последний раз обнаружена активность
+			// РЅРѕРјРµСЂ РёС‚РµСЂР°С†РёРё, РЅР° РєРѕС‚РѕСЂРѕР№ РїРѕСЃР»РµРґРЅРёР№ СЂР°Р· РѕР±РЅР°СЂСѓР¶РµРЅР° Р°РєС‚РёРІРЅРѕСЃС‚СЊ
 			if (diskPerformance.ReadCount != ReadCountOld || diskPerformance.WriteCount != WriteCountOld)
 				iter_dif = iter;
 
-			// сообщение о занятости диска операциями
+			// СЃРѕРѕР±С‰РµРЅРёРµ Рѕ Р·Р°РЅСЏС‚РѕСЃС‚Рё РґРёСЃРєР° РѕРїРµСЂР°С†РёСЏРјРё
 			if (iter_dif > 0 && !busy_flag) {
 				busy_flag = true;
 				WcoutExt_Mini(L"Disk is busy, wait for end, but no more than " + std::to_wstring(timeout) + L" milliseconds...\r\n", resp, true);
 			}
 
-			// операций с диском не зафиксировано за 2 тика (секунды)
+			// РѕРїРµСЂР°С†РёР№ СЃ РґРёСЃРєРѕРј РЅРµ Р·Р°С„РёРєСЃРёСЂРѕРІР°РЅРѕ Р·Р° 2 С‚РёРєР° (СЃРµРєСѓРЅРґС‹)
 			if (iter - iter_dif >= 2) {
 				if (busy_flag) WcoutExt_Mini(L"Successfully wait for disk operations to end\r\n", resp, true);
 				return true;
 			}
 
-			// выход по таймауту
+			// РІС‹С…РѕРґ РїРѕ С‚Р°Р№РјР°СѓС‚Сѓ
 			if (iter >= iter_max) {
 				WcoutExt(L"Error: disk waiting timeout expired\r\n", resp, false);
 				return false;
@@ -223,28 +223,28 @@ bool WaitDiskActivity(const HANDLE hDevice, const DWORD timeout, s_resp& resp) {
 }
 
 
-// остановить шпиндель
+// РѕСЃС‚Р°РЅРѕРІРёС‚СЊ С€РїРёРЅРґРµР»СЊ
 bool SendSpinDown(const HANDLE hDevice) {
 	SCSI_PASS_THROUGH spt = { 0 };
 	spt.Length = sizeof(SCSI_PASS_THROUGH);
-	spt.CdbLength = 6; // длина команды SCSI CDB
+	spt.CdbLength = 6; // РґР»РёРЅР° РєРѕРјР°РЅРґС‹ SCSI CDB
 	spt.DataIn = SCSI_IOCTL_DATA_UNSPECIFIED;
-	spt.TimeOutValue = 2;	// таймаут в секундах
-	spt.Cdb[0] = 0x1B;		// команда START STOP UNIT
+	spt.TimeOutValue = 2;	// С‚Р°Р№РјР°СѓС‚ РІ СЃРµРєСѓРЅРґР°С…
+	spt.Cdb[0] = 0x1B;		// РєРѕРјР°РЅРґР° START STOP UNIT
 	spt.Cdb[1] = 0;			// Logical Unit Number (LUN)
-	spt.Cdb[4] = 0;			// остановить диск (SPINDOWN)
+	spt.Cdb[4] = 0;			// РѕСЃС‚Р°РЅРѕРІРёС‚СЊ РґРёСЃРє (SPINDOWN)
 	spt.Cdb[5] = 0;			// control byte
 
 	DWORD error;
 	DWORD returned;
-	int steps = 10;	// максимальное количество попыток
+	int steps = 10;	// РјР°РєСЃРёРјР°Р»СЊРЅРѕРµ РєРѕР»РёС‡РµСЃС‚РІРѕ РїРѕРїС‹С‚РѕРє
 
-	// повторять если диск не успел уснуть за отведенный таймаут
+	// РїРѕРІС‚РѕСЂСЏС‚СЊ РµСЃР»Рё РґРёСЃРє РЅРµ СѓСЃРїРµР» СѓСЃРЅСѓС‚СЊ Р·Р° РѕС‚РІРµРґРµРЅРЅС‹Р№ С‚Р°Р№РјР°СѓС‚
 	do {
 		error = 0;
 		returned = 0;
 		steps--;
-		// отправляем команду SCSI
+		// РѕС‚РїСЂР°РІР»СЏРµРј РєРѕРјР°РЅРґСѓ SCSI
 		if (!DeviceIoControl(
 			hDevice,
 			IOCTL_SCSI_PASS_THROUGH,
@@ -263,13 +263,13 @@ bool SendSpinDown(const HANDLE hDevice) {
 			return true;
 		}
 
-	} while (error == ERROR_IO_DEVICE && steps > 0);	// если код ошибки ERROR_IO_DEVICE (1117) - возможно устройство не успело уснуть
+	} while (error == ERROR_IO_DEVICE && steps > 0);	// РµСЃР»Рё РєРѕРґ РѕС€РёР±РєРё ERROR_IO_DEVICE (1117) - РІРѕР·РјРѕР¶РЅРѕ СѓСЃС‚СЂРѕР№СЃС‚РІРѕ РЅРµ СѓСЃРїРµР»Рѕ СѓСЃРЅСѓС‚СЊ
 
 	return false;
 }
 
 
-// запустить шпиндель
+// Р·Р°РїСѓСЃС‚РёС‚СЊ С€РїРёРЅРґРµР»СЊ
 bool SendSpinUp(const HANDLE hDevice) {
 	DWORD bytesReturned;
 	if (!DeviceIoControl(
@@ -289,15 +289,15 @@ bool SendSpinUp(const HANDLE hDevice) {
 }
 
 
-// усыпить диск
+// СѓСЃС‹РїРёС‚СЊ РґРёСЃРє
 bool DiskSpinDown(const std::wstring& devicePath, const DWORD timeout, s_resp& resp) {
-	// открываем диск
+	// РѕС‚РєСЂС‹РІР°РµРј РґРёСЃРє
 	HANDLE hDevice;
 	if (!OpenDevice(hDevice, devicePath, resp)) {
 		return false;
 	}
 
-	// синхронизируем кэш
+	// СЃРёРЅС…СЂРѕРЅРёР·РёСЂСѓРµРј РєСЌС€
 	WcoutExt_Mini(L"Send command to synchronize disk cache...\r\n", resp, true);
 	if (!SendSynchronizeCache(hDevice)) {
 		WcoutExt(L"Failed to synchronize the disk cache before stopping the spindle. " + GetLastErrorString() + L"\r\n", resp, false);
@@ -305,14 +305,14 @@ bool DiskSpinDown(const std::wstring& devicePath, const DWORD timeout, s_resp& r
 		return false;
 	}
 
-	// проверка на операции чтения/записи
+	// РїСЂРѕРІРµСЂРєР° РЅР° РѕРїРµСЂР°С†РёРё С‡С‚РµРЅРёСЏ/Р·Р°РїРёСЃРё
 	WcoutExt_Mini(L"Checking disk activity...\r\n", resp, true);
 	if (!WaitDiskActivity(hDevice, timeout, resp)) {
 		CloseHandle(hDevice);
 		return false;
 	}
 
-	// остановим
+	// РѕСЃС‚Р°РЅРѕРІРёРј
 	WcoutExt_Mini(L"Send command to stop spindle...\r\n", resp, true);
 	if (!SendSpinDown(hDevice)) {
 		WcoutExt(L"Failed to stop disk spindle. " + GetLastErrorString() + L"\r\n", resp, false);
@@ -327,15 +327,15 @@ bool DiskSpinDown(const std::wstring& devicePath, const DWORD timeout, s_resp& r
 }
 
 
-// разбудить диск
+// СЂР°Р·Р±СѓРґРёС‚СЊ РґРёСЃРє
 bool DiskSpinUp(const std::wstring& devicePath, s_resp& resp) {
-	// открываем диск
+	// РѕС‚РєСЂС‹РІР°РµРј РґРёСЃРє
 	HANDLE hDevice;
 	if (!OpenDevice(hDevice, devicePath, resp)) {
 		return false;
 	}
 
-	// разбудим
+	// СЂР°Р·Р±СѓРґРёРј
 	WcoutExt_Mini(L"Send command to wake-up disk...\r\n", resp, true);
 	if (!SendSpinUp(hDevice)) {
 		WcoutExt(L"Failed to start disk spindle. " + GetLastErrorString() + L"\r\n", resp, false);
@@ -350,24 +350,24 @@ bool DiskSpinUp(const std::wstring& devicePath, s_resp& resp) {
 }
 
 
-// команда отключить/подключить диск
+// РєРѕРјР°РЅРґР° РѕС‚РєР»СЋС‡РёС‚СЊ/РїРѕРґРєР»СЋС‡РёС‚СЊ РґРёСЃРє
 bool SendDiskAvailability(const HANDLE hDevice, const bool availability, const bool permanent, s_resp& resp) {
 	DWORD bytesReturned = 0;
 	SET_DISK_ATTRIBUTES disk_attr;
 	ZeroMemory(&disk_attr, sizeof(disk_attr));
 
 	disk_attr.Version = sizeof(SET_DISK_ATTRIBUTES);
-	disk_attr.Persist = permanent; // сохранить изменения после перезагрузки
+	disk_attr.Persist = permanent; // СЃРѕС…СЂР°РЅРёС‚СЊ РёР·РјРµРЅРµРЅРёСЏ РїРѕСЃР»Рµ РїРµСЂРµР·Р°РіСЂСѓР·РєРё
 	disk_attr.Attributes = !availability ? DISK_ATTRIBUTE_OFFLINE : 0;
 	disk_attr.AttributesMask = DISK_ATTRIBUTE_OFFLINE;
 
-	// применить атрибуты доступности диска
+	// РїСЂРёРјРµРЅРёС‚СЊ Р°С‚СЂРёР±СѓС‚С‹ РґРѕСЃС‚СѓРїРЅРѕСЃС‚Рё РґРёСЃРєР°
 	if (!DeviceIoControl(hDevice, IOCTL_DISK_SET_DISK_ATTRIBUTES, &disk_attr, disk_attr.Version, NULL, 0, &bytesReturned, NULL)) {
 		WcoutExt(L"Failed to set disk availability attributes. " + GetLastErrorString() + L"\r\n", resp, false);
 		return false;
 	}
 
-	// обновить перечисление устройств, если диск подключили к системе
+	// РѕР±РЅРѕРІРёС‚СЊ РїРµСЂРµС‡РёСЃР»РµРЅРёРµ СѓСЃС‚СЂРѕР№СЃС‚РІ, РµСЃР»Рё РґРёСЃРє РїРѕРґРєР»СЋС‡РёР»Рё Рє СЃРёСЃС‚РµРјРµ
 	if (availability) {
 		if (!DeviceIoControl(hDevice, IOCTL_DISK_UPDATE_PROPERTIES, NULL, 0, NULL, 0, &bytesReturned, NULL)) {
 			WcoutExt(L"Failed to update disk properties after applying its accessibility to the online state. " + GetLastErrorString() + L"\r\n", resp, false);
@@ -379,22 +379,22 @@ bool SendDiskAvailability(const HANDLE hDevice, const bool availability, const b
 }
 
 
-// отключить диск от системы
+// РѕС‚РєР»СЋС‡РёС‚СЊ РґРёСЃРє РѕС‚ СЃРёСЃС‚РµРјС‹
 bool DiskGoOffline(const std::wstring& devicePath, const bool permanent, const bool force, const DWORD timeout, s_resp& resp) {
-	// открываем диск
+	// РѕС‚РєСЂС‹РІР°РµРј РґРёСЃРє
 	HANDLE hDevice;
 	if (!OpenDevice(hDevice, devicePath, resp)) {
 		return false;
 	}
 	
-	// проверка диска на наличие системных файлов
+	// РїСЂРѕРІРµСЂРєР° РґРёСЃРєР° РЅР° РЅР°Р»РёС‡РёРµ СЃРёСЃС‚РµРјРЅС‹С… С„Р°Р№Р»РѕРІ
 	WcoutExt_Mini(L"Checking the selected disk...\r\n", resp, true);
 	if (!IsNotSystemDisk(hDevice, resp)) {
 		CloseHandle(hDevice);
 		return false;
 	}
 
-	// проверка на операции чтения/записи
+	// РїСЂРѕРІРµСЂРєР° РЅР° РѕРїРµСЂР°С†РёРё С‡С‚РµРЅРёСЏ/Р·Р°РїРёСЃРё
 	if (!force) {
 		WcoutExt_Mini(L"Checking disk activity...\r\n", resp, true);
 		if (!WaitDiskActivity(hDevice, timeout, resp)) {
@@ -403,7 +403,7 @@ bool DiskGoOffline(const std::wstring& devicePath, const bool permanent, const b
 		}
 	}
 
-	// отключим диск
+	// РѕС‚РєР»СЋС‡РёРј РґРёСЃРє
 	WcoutExt_Mini(L"Applying offline mode to the selected disk...\r\n", resp, true);
 	if (!SendDiskAvailability(hDevice, false, permanent, resp)) {
 		CloseHandle(hDevice);
@@ -417,16 +417,16 @@ bool DiskGoOffline(const std::wstring& devicePath, const bool permanent, const b
 }
 
 
-// подключить диск к системе
+// РїРѕРґРєР»СЋС‡РёС‚СЊ РґРёСЃРє Рє СЃРёСЃС‚РµРјРµ
 bool DiskGoOnline(const std::wstring& devicePath, const bool permanent, s_resp& resp) {
 
-	// открываем диск
+	// РѕС‚РєСЂС‹РІР°РµРј РґРёСЃРє
 	HANDLE hDevice;
 	if (!OpenDevice(hDevice, devicePath, resp)) {
 		return false;
 	}
 
-	// подключим диск
+	// РїРѕРґРєР»СЋС‡РёРј РґРёСЃРє
 	WcoutExt_Mini(L"Applying online mode to the selected disk...\r\n", resp, true);
 	if (!SendDiskAvailability(hDevice, true, permanent, resp)) {
 		CloseHandle(hDevice);

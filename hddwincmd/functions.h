@@ -3,56 +3,56 @@
 #include <windows.h>
 #include <string>
 
-// вспомогательная структура для выодв ы консоль
+// РІСЃРїРѕРјРѕРіР°С‚РµР»СЊРЅР°СЏ СЃС‚СЂСѓРєС‚СѓСЂР° РґР»СЏ РІС‹РѕРґРІ С‹ РєРѕРЅСЃРѕР»СЊ
 struct s_resp {
 	int type;
 	bool successAll;
 };
 
-// выводит весь текст если response_type = text
+// РІС‹РІРѕРґРёС‚ РІРµСЃСЊ С‚РµРєСЃС‚ РµСЃР»Рё response_type = text
 void WcoutExt_Mini(const std::wstring& txt, s_resp& resp, const bool success);
-// выводит текст при response_type = 2, выводит success/failure при response_type = 1
+// РІС‹РІРѕРґРёС‚ С‚РµРєСЃС‚ РїСЂРё response_type = 2, РІС‹РІРѕРґРёС‚ success/failure РїСЂРё response_type = 1
 void WcoutExt(const std::wstring& txt, s_resp& resp, const bool success);
 
-// проверка - строка только из цифр
+// РїСЂРѕРІРµСЂРєР° - СЃС‚СЂРѕРєР° С‚РѕР»СЊРєРѕ РёР· С†РёС„СЂ
 bool IsDigitsOnly(const std::wstring& str);
 
-// проверка - строка вида /dev/sda
+// РїСЂРѕРІРµСЂРєР° - СЃС‚СЂРѕРєР° РІРёРґР° /dev/sda
 bool IsLinuxDriveFormat(const std::wstring& str);
 
-// проверка - одна латинская буква
+// РїСЂРѕРІРµСЂРєР° - РѕРґРЅР° Р»Р°С‚РёРЅСЃРєР°СЏ Р±СѓРєРІР°
 bool IsOneLetter(const std::wstring& str);
 
-// проверка - строка вида volume GUID
+// РїСЂРѕРІРµСЂРєР° - СЃС‚СЂРѕРєР° РІРёРґР° volume GUID
 bool IsVolumeGUID(const std::wstring& str);
 
-// строка в многобайтовую строку
+// СЃС‚СЂРѕРєР° РІ РјРЅРѕРіРѕР±Р°Р№С‚РѕРІСѓСЋ СЃС‚СЂРѕРєСѓ
 std::wstring StringToWstring(const char* str);
 std::wstring StringToWstring(const std::string& str);
 
-// преобразовать число в буквенное представление изчисления дисков Linux
+// РїСЂРµРѕР±СЂР°Р·РѕРІР°С‚СЊ С‡РёСЃР»Рѕ РІ Р±СѓРєРІРµРЅРЅРѕРµ РїСЂРµРґСЃС‚Р°РІР»РµРЅРёРµ РёР·С‡РёСЃР»РµРЅРёСЏ РґРёСЃРєРѕРІ Linux
 std::wstring NumberTolinuxDriveLetters(int num);
 
-// преобразование последовательности букв Linux диска в число
+// РїСЂРµРѕР±СЂР°Р·РѕРІР°РЅРёРµ РїРѕСЃР»РµРґРѕРІР°С‚РµР»СЊРЅРѕСЃС‚Рё Р±СѓРєРІ Linux РґРёСЃРєР° РІ С‡РёСЃР»Рѕ
 std::wstring LinuxDriveLettersToNumber(const std::wstring& input);
 
-// конвертировать GUID в строку
+// РєРѕРЅРІРµСЂС‚РёСЂРѕРІР°С‚СЊ GUID РІ СЃС‚СЂРѕРєСѓ
 std::wstring GUIDtoString(const GUID& guid);
 
-// получить номер физического диска по volume GUID одного из его логических дисков
+// РїРѕР»СѓС‡РёС‚СЊ РЅРѕРјРµСЂ С„РёР·РёС‡РµСЃРєРѕРіРѕ РґРёСЃРєР° РїРѕ volume GUID РѕРґРЅРѕРіРѕ РёР· РµРіРѕ Р»РѕРіРёС‡РµСЃРєРёС… РґРёСЃРєРѕРІ
 int GetPhysicalDriveFromVolumeGUID(std::wstring volumePathName);
 
-// распознать введенный drive
+// СЂР°СЃРїРѕР·РЅР°С‚СЊ РІРІРµРґРµРЅРЅС‹Р№ drive
 std::wstring GetPhysicalDriveFromDriveStr(const std::wstring& drive);
 
-// получение номера диска	
+// РїРѕР»СѓС‡РµРЅРёРµ РЅРѕРјРµСЂР° РґРёСЃРєР°	
 int GetDriveNumber(const HANDLE& hDrive);
 
-// конвертировать кол-во байт в удобочитаемый вид
+// РєРѕРЅРІРµСЂС‚РёСЂРѕРІР°С‚СЊ РєРѕР»-РІРѕ Р±Р°Р№С‚ РІ СѓРґРѕР±РѕС‡РёС‚Р°РµРјС‹Р№ РІРёРґ
 std::wstring BytesToFormatString(long long bytes);
 
-// код последней ошибки с расшифровкой
+// РєРѕРґ РїРѕСЃР»РµРґРЅРµР№ РѕС€РёР±РєРё СЃ СЂР°СЃС€РёС„СЂРѕРІРєРѕР№
 std::wstring GetLastErrorString();
 
-// открыть диск
+// РѕС‚РєСЂС‹С‚СЊ РґРёСЃРє
 bool OpenDevice(HANDLE& hDevice, const std::wstring& devicePath, s_resp& resp);

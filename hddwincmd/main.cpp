@@ -9,7 +9,7 @@
 
 
 int main(int argc, char* argv[]) {
-	// кодировка консоли
+	// РєРѕРґРёСЂРѕРІРєР° РєРѕРЅСЃРѕР»Рё
 	SetConsoleOutputCP(CP_UTF8);
 	SetConsoleCP(CP_UTF8);
 	std::locale::global(std::locale(""));
@@ -23,13 +23,13 @@ int main(int argc, char* argv[]) {
 	bool notclose = false;
 	DWORD timeout = 20000;
 
-	// без аргументов - список команд
+	// Р±РµР· Р°СЂРіСѓРјРµРЅС‚РѕРІ - СЃРїРёСЃРѕРє РєРѕРјР°РЅРґ
 	if (argc == 1) {
 		WcoutExt(helpText, resp, true);
 		notclose = true;
 	}
 
-	// если первая команда меняет тип вывода в консоль
+	// РµСЃР»Рё РїРµСЂРІР°СЏ РєРѕРјР°РЅРґР° РјРµРЅСЏРµС‚ С‚РёРї РІС‹РІРѕРґР° РІ РєРѕРЅСЃРѕР»СЊ
 	if (argc >= 3) {
 		arg_k = argv[1];
 		arg_p = argv[2];
@@ -39,19 +39,19 @@ int main(int argc, char* argv[]) {
 			else if (arg_p == "hide") {
 				resp.type = -1;
 				HWND hWnd = GetConsoleWindow();
-				if (hWnd != NULL) ShowWindow(hWnd, SW_HIDE);	// скрываем окно консоли
+				if (hWnd != NULL) ShowWindow(hWnd, SW_HIDE);	// СЃРєСЂС‹РІР°РµРј РѕРєРЅРѕ РєРѕРЅСЃРѕР»Рё
 			}
 		}
 	}
 
-	// интерпретация списка команд
+	// РёРЅС‚РµСЂРїСЂРµС‚Р°С†РёСЏ СЃРїРёСЃРєР° РєРѕРјР°РЅРґ
 	for (int k = 1; k < argc; ++k) {
 		arg_k = argv[k];
 
-		// команда начинается с "--"
+		// РєРѕРјР°РЅРґР° РЅР°С‡РёРЅР°РµС‚СЃСЏ СЃ "--"
 		if (arg_k.rfind("--", 0) == 0) {
 
-			// узнаем доступное количество параметров
+			// СѓР·РЅР°РµРј РґРѕСЃС‚СѓРїРЅРѕРµ РєРѕР»РёС‡РµСЃС‚РІРѕ РїР°СЂР°РјРµС‚СЂРѕРІ
 			int params = 0;
 			for (int p = k + 1; p < argc; ++p) {
 				arg_p = argv[p];
@@ -59,7 +59,7 @@ int main(int argc, char* argv[]) {
 				params++;
 			}
 
-			// показать текущую команду c параметрами
+			// РїРѕРєР°Р·Р°С‚СЊ С‚РµРєСѓС‰СѓСЋ РєРѕРјР°РЅРґСѓ c РїР°СЂР°РјРµС‚СЂР°РјРё
 			if (resp.type > 1) {
 				std::wstring str = StringToWstring(arg_k);
 				for (int p = k + 1; p < argc; ++p) {
@@ -69,14 +69,14 @@ int main(int argc, char* argv[]) {
 				std::wcout << L"[CMD]: " + str + L"\r\n";
 			}
 
-			// обработка конкретных команд:
+			// РѕР±СЂР°Р±РѕС‚РєР° РєРѕРЅРєСЂРµС‚РЅС‹С… РєРѕРјР°РЅРґ:
 
-			// помощь
+			// РїРѕРјРѕС‰СЊ
 			if (arg_k == "--h" || arg_k == "--help") {
 				WcoutExt(helpText, resp, true);
 			}
 
-			// параметр путь к диску
+			// РїР°СЂР°РјРµС‚СЂ РїСѓС‚СЊ Рє РґРёСЃРєСѓ
 			else if (arg_k == "--d" || arg_k == "--disk") {
 				if (params == 0) WcoutExt(L"Error in [" + StringToWstring(arg_k) + L"] command: parameter required\r\n", resp, false);
 				else { 
@@ -85,7 +85,7 @@ int main(int argc, char* argv[]) {
 				}
 			}
 
-			// параметр таймаут
+			// РїР°СЂР°РјРµС‚СЂ С‚Р°Р№РјР°СѓС‚
 			else if (arg_k == "--t" || arg_k == "--timeout") {
 				if (params == 0) WcoutExt(L"Error in [" + StringToWstring(arg_k) + L"] command: parameter required\r\n", resp, false);
 				else {
@@ -100,37 +100,37 @@ int main(int argc, char* argv[]) {
 				}
 			}
 
-			// инфо о диске
+			// РёРЅС„Рѕ Рѕ РґРёСЃРєРµ
 			else if (arg_k == "--i" || arg_k == "--info") {
 				if (disk == L"") {
 					GetPhysicalDrivesList(true, resp);
 				}
 				else {
-					// получим соответствия дисков и их guid
+					// РїРѕР»СѓС‡РёРј СЃРѕРѕС‚РІРµС‚СЃС‚РІРёСЏ РґРёСЃРєРѕРІ Рё РёС… guid
 					std::vector<DiskInfo> logicalDisks;
 					GetLogicalVolumes(logicalDisks);
-					// инфо о диске
+					// РёРЅС„Рѕ Рѕ РґРёСЃРєРµ
 					if (GetPhysicalDrive(GetPhysicalDriveFromDriveStr(disk), logicalDisks, true, resp, true)) WcoutExt(L"", resp, true);
 					else WcoutExt(L"Could not get disk information: [" + disk + L"]\r\n", resp, false);
 				}
 			}
 
-			// инфо о диске (кратко)
+			// РёРЅС„Рѕ Рѕ РґРёСЃРєРµ (РєСЂР°С‚РєРѕ)
 			else if (arg_k == "--im" || arg_k == "--infomin") {
 				if (disk == L"") {
 					GetPhysicalDrivesList(false, resp);
 				}
 				else {
-					// получим соответствия дисков и их guid
+					// РїРѕР»СѓС‡РёРј СЃРѕРѕС‚РІРµС‚СЃС‚РІРёСЏ РґРёСЃРєРѕРІ Рё РёС… guid
 					std::vector<DiskInfo> logicalDisks;
 					GetLogicalVolumes(logicalDisks);
-					// инфо о диске
+					// РёРЅС„Рѕ Рѕ РґРёСЃРєРµ
 					if (GetPhysicalDrive(GetPhysicalDriveFromDriveStr(disk), logicalDisks, false, resp, true)) WcoutExt(L"", resp, true);
 					else WcoutExt(L"Could not get disk information: [" + disk + L"]\r\n", resp, false);
 				}
 			}
 
-			// остановить/раскрутить шпиндель
+			// РѕСЃС‚Р°РЅРѕРІРёС‚СЊ/СЂР°СЃРєСЂСѓС‚РёС‚СЊ С€РїРёРЅРґРµР»СЊ
 			else if (arg_k == "--s" || arg_k == "--spin") {
 				if (disk == L"") {
 					WcoutExt(L"Error in [" + StringToWstring(arg_k) + L"] command: before executing the command, you must select the disk (using --disk)\r\n", resp, false);
@@ -145,14 +145,14 @@ int main(int argc, char* argv[]) {
 				}
 			}
 
-			// отключить/подключить диск
+			// РѕС‚РєР»СЋС‡РёС‚СЊ/РїРѕРґРєР»СЋС‡РёС‚СЊ РґРёСЃРє
 			else if (arg_k == "--p" || arg_k == "--plug") {
 				if (disk == L"") {
 					WcoutExt(L"Error in [" + StringToWstring(arg_k) + L"] command: before executing the command, you must select the disk (using --disk)\r\n", resp, false);
 				}else {
 					if (params == 0) WcoutExt(L"Error in [" + StringToWstring(arg_k) + L"] command: parameter required\r\n", resp, false);
 					else {
-						// флаги
+						// С„Р»Р°РіРё
 						bool permanent = false;
 						bool force = false;
 						if (params >= 2) {
@@ -166,7 +166,7 @@ int main(int argc, char* argv[]) {
 								else WcoutExt_Mini(L"Warning in [" + StringToWstring(arg_k) + L"] command: unknown parameter [" + StringToWstring(arg_p) + L"]\r\n", resp, true);
 							}
 						}
-						// первый параметр
+						// РїРµСЂРІС‹Р№ РїР°СЂР°РјРµС‚СЂ
 						arg_p = argv[k + 1];
 						if (arg_p == "0" || arg_p == "offline") DiskGoOffline(GetPhysicalDriveFromDriveStr(disk), permanent, force, timeout, resp);
 						else if (arg_p == "1" || arg_p == "online") DiskGoOnline(GetPhysicalDriveFromDriveStr(disk), permanent, resp);
@@ -175,7 +175,7 @@ int main(int argc, char* argv[]) {
 				}
 			}
 
-			// ожидание
+			// РѕР¶РёРґР°РЅРёРµ
 			else if (arg_k == "--w" || arg_k == "--wait") {
 				if (params == 0) WcoutExt(L"Error in [" + StringToWstring(arg_k) + L"] command: parameter required\r\n", resp, false);
 				else {
@@ -191,14 +191,14 @@ int main(int argc, char* argv[]) {
 				}
 			}
 
-			// оставить консоль по окончанию
+			// РѕСЃС‚Р°РІРёС‚СЊ РєРѕРЅСЃРѕР»СЊ РїРѕ РѕРєРѕРЅС‡Р°РЅРёСЋ
 			else if (arg_k == "--nc" || arg_k == "--notclose") {
 				if (notclose) WcoutExt(L"Already applied before\r\n", resp, true);
 				else WcoutExt(L"Applied\r\n", resp, true);
 				notclose = true;
 			}
 
-			// тип вывода в консоль
+			// С‚РёРї РІС‹РІРѕРґР° РІ РєРѕРЅСЃРѕР»СЊ
 			else if (arg_k == "--r" || arg_k == "--response") {
 				if (params == 0) WcoutExt(L"Error in [" + StringToWstring(arg_k) + L"] command: parameter required\r\n", resp, false);
 				else {
@@ -210,18 +210,18 @@ int main(int argc, char* argv[]) {
 					else if (arg_p == "hide") {
 						resp.type = -1;
 						HWND hWnd = GetConsoleWindow();
-						if (hWnd != NULL) ShowWindow(hWnd, SW_HIDE);	// скрываем окно консоли
+						if (hWnd != NULL) ShowWindow(hWnd, SW_HIDE);	// СЃРєСЂС‹РІР°РµРј РѕРєРЅРѕ РєРѕРЅСЃРѕР»Рё
 					}
 					else WcoutExt(L"Error in [" + StringToWstring(arg_k) + L"] command: unknown parameter [" + StringToWstring(arg_p) + L"]\r\n", resp, false);
 
 					if (resp_type_old == -1 && resp.type > -1) {
 						HWND hWnd = GetConsoleWindow();
-						if (hWnd != NULL) ShowWindow(hWnd, SW_SHOW);	// покажем окно консоли
+						if (hWnd != NULL) ShowWindow(hWnd, SW_SHOW);	// РїРѕРєР°Р¶РµРј РѕРєРЅРѕ РєРѕРЅСЃРѕР»Рё
 					}
 				}
 			}
 
-			// неизвестная команда
+			// РЅРµРёР·РІРµСЃС‚РЅР°СЏ РєРѕРјР°РЅРґР°
 			else WcoutExt(L"Unknown command: " + StringToWstring(arg_k) + L"\r\n", resp, false);
 
 			WcoutExt_Mini(L"\r\n", resp, true);

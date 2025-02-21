@@ -2,7 +2,7 @@
 
 #include "functions.h"
 
-// winapi для атрибутов отключить/подключить диск
+// winapi РґР»СЏ Р°С‚СЂРёР±СѓС‚РѕРІ РѕС‚РєР»СЋС‡РёС‚СЊ/РїРѕРґРєР»СЋС‡РёС‚СЊ РґРёСЃРє
 typedef struct _SET_DISK_ATTRIBUTES {
 	DWORD Version;
 	BOOLEAN Persist;
@@ -15,38 +15,38 @@ typedef struct _SET_DISK_ATTRIBUTES {
 #define IOCTL_DISK_SET_DISK_ATTRIBUTES      CTL_CODE(IOCTL_DISK_BASE, 0x003d, METHOD_BUFFERED, FILE_READ_ACCESS | FILE_WRITE_ACCESS)
 
 
-// проверить принадлежит ли логический том (по его букве) к указанному номеру диска
+// РїСЂРѕРІРµСЂРёС‚СЊ РїСЂРёРЅР°РґР»РµР¶РёС‚ Р»Рё Р»РѕРіРёС‡РµСЃРєРёР№ С‚РѕРј (РїРѕ РµРіРѕ Р±СѓРєРІРµ) Рє СѓРєР°Р·Р°РЅРЅРѕРјСѓ РЅРѕРјРµСЂСѓ РґРёСЃРєР°
 int CheckVolumeLetterOnDiskNumber(const wchar_t volumeLetter, const int deviceNumber, s_resp& resp);
 
-// получить буквы всех дисков, содержащих файл подкачки
+// РїРѕР»СѓС‡РёС‚СЊ Р±СѓРєРІС‹ РІСЃРµС… РґРёСЃРєРѕРІ, СЃРѕРґРµСЂР¶Р°С‰РёС… С„Р°Р№Р» РїРѕРґРєР°С‡РєРё
 bool GetVolumeLettersContainingSwapFile(std::wstring& letters, s_resp& resp);
 
-// проверка диска на наличие системных файлов
+// РїСЂРѕРІРµСЂРєР° РґРёСЃРєР° РЅР° РЅР°Р»РёС‡РёРµ СЃРёСЃС‚РµРјРЅС‹С… С„Р°Р№Р»РѕРІ
 bool IsNotSystemDisk(const HANDLE hDevice, s_resp& resp);
 
-// синхронизировать кэш диска
+// СЃРёРЅС…СЂРѕРЅРёР·РёСЂРѕРІР°С‚СЊ РєСЌС€ РґРёСЃРєР°
 bool SendSynchronizeCache(const HANDLE hDevice);
 
-// ожидание завершения операций с диском
+// РѕР¶РёРґР°РЅРёРµ Р·Р°РІРµСЂС€РµРЅРёСЏ РѕРїРµСЂР°С†РёР№ СЃ РґРёСЃРєРѕРј
 bool WaitDiskActivity(const HANDLE hDevice, const DWORD timeout, s_resp& resp);
 
-// остановить шпиндель
+// РѕСЃС‚Р°РЅРѕРІРёС‚СЊ С€РїРёРЅРґРµР»СЊ
 bool SendSpinDown(const HANDLE hDevice);
 
-// запустить шпиндель
+// Р·Р°РїСѓСЃС‚РёС‚СЊ С€РїРёРЅРґРµР»СЊ
 bool SendSpinUp(const HANDLE hDevice);
 
-// усыпить диск
+// СѓСЃС‹РїРёС‚СЊ РґРёСЃРє
 bool DiskSpinDown(const std::wstring& devicePath, const DWORD timeout, s_resp& resp);
 
-// разбудить диск
+// СЂР°Р·Р±СѓРґРёС‚СЊ РґРёСЃРє
 bool DiskSpinUp(const std::wstring& devicePath, s_resp& resp);
 
-// команда отключить/подключить диск
+// РєРѕРјР°РЅРґР° РѕС‚РєР»СЋС‡РёС‚СЊ/РїРѕРґРєР»СЋС‡РёС‚СЊ РґРёСЃРє
 bool SendDiskAvailability(const HANDLE hDevice, const bool availability, const bool permanent, s_resp& resp);
 
-// отключить диск от системы
+// РѕС‚РєР»СЋС‡РёС‚СЊ РґРёСЃРє РѕС‚ СЃРёСЃС‚РµРјС‹
 bool DiskGoOffline(const std::wstring& devicePath, const bool permanent, const bool force, const DWORD timeout, s_resp& resp);
 
-// подключить диск к системе
+// РїРѕРґРєР»СЋС‡РёС‚СЊ РґРёСЃРє Рє СЃРёСЃС‚РµРјРµ
 bool DiskGoOnline(const std::wstring& devicePath, const bool permanent, s_resp& resp);

@@ -6,7 +6,7 @@
 
 #include "functions.h"
 
-// структука информации об устройстве
+// СЃС‚СЂСѓРєС‚СѓРєР° РёРЅС„РѕСЂРјР°С†РёРё РѕР± СѓСЃС‚СЂРѕР№СЃС‚РІРµ
 struct DriveInfo {
 	std::wstring busType;
 	std::wstring product;
@@ -17,60 +17,60 @@ struct DriveInfo {
 	std::wstring ncq;
 };
 
-// структука привязка логического диска
+// СЃС‚СЂСѓРєС‚СѓРєР° РїСЂРёРІСЏР·РєР° Р»РѕРіРёС‡РµСЃРєРѕРіРѕ РґРёСЃРєР°
 struct DiskInfo {
 	unsigned long PhysicalDriveNumber;
 	long long StartingOffset;
 	std::wstring GUID;
 };
 
-// извлечь тип MBR раздела из базы строк
+// РёР·РІР»РµС‡СЊ С‚РёРї MBR СЂР°Р·РґРµР»Р° РёР· Р±Р°Р·С‹ СЃС‚СЂРѕРє
 std::wstring GetMBRPartitionType(const BYTE id);
 
-// заполнить массив привязки логических дисков
+// Р·Р°РїРѕР»РЅРёС‚СЊ РјР°СЃСЃРёРІ РїСЂРёРІСЏР·РєРё Р»РѕРіРёС‡РµСЃРєРёС… РґРёСЃРєРѕРІ
 std::vector<std::wstring> GetDriveLetters();
 
-// получение полей STORAGE_DEVICE_DESCRIPTOR в строки
+// РїРѕР»СѓС‡РµРЅРёРµ РїРѕР»РµР№ STORAGE_DEVICE_DESCRIPTOR РІ СЃС‚СЂРѕРєРё
 std::wstring GetDescriptorString(BYTE* buffer, const DWORD offset);
 
-// получение информации о диске
+// РїРѕР»СѓС‡РµРЅРёРµ РёРЅС„РѕСЂРјР°С†РёРё Рѕ РґРёСЃРєРµ
 void GetPhysicalDriveInfo(const HANDLE& hDrive, DriveInfo& drive);
 
-// составить список всех логических дисков
+// СЃРѕСЃС‚Р°РІРёС‚СЊ СЃРїРёСЃРѕРє РІСЃРµС… Р»РѕРіРёС‡РµСЃРєРёС… РґРёСЃРєРѕРІ
 bool GetLogicalVolumes(std::vector<DiskInfo>& logicalDisks);
 
-// получить букву диска по volume GUID
+// РїРѕР»СѓС‡РёС‚СЊ Р±СѓРєРІСѓ РґРёСЃРєР° РїРѕ volume GUID
 std::wstring GetDriveLetterFromVolumeGUID(const std::wstring& volumeGUID);
 
-// получение геометрии диска
+// РїРѕР»СѓС‡РµРЅРёРµ РіРµРѕРјРµС‚СЂРёРё РґРёСЃРєР°
 void GetDriveGeometry(const HANDLE& hDrive, std::wstring& geometry, std::wstring& size);
 
-// получить путь диска по его номеру в системе	
+// РїРѕР»СѓС‡РёС‚СЊ РїСѓС‚СЊ РґРёСЃРєР° РїРѕ РµРіРѕ РЅРѕРјРµСЂСѓ РІ СЃРёСЃС‚РµРјРµ	
 std::wstring GetPermanentDevicePathByDeviceNumber(int deviceNumber);
 
-// получить список дисков
+// РїРѕР»СѓС‡РёС‚СЊ СЃРїРёСЃРѕРє РґРёСЃРєРѕРІ
 void GetPhysicalDrivesList(bool maxinfo, s_resp& resp);
 
-// получить информацию о диске
+// РїРѕР»СѓС‡РёС‚СЊ РёРЅС„РѕСЂРјР°С†РёСЋ Рѕ РґРёСЃРєРµ
 bool GetPhysicalDrive(const std::wstring& physicalDrive, std::vector<DiskInfo>& logicalDisks, const bool maxinfo, s_resp& resp, const bool single_source);
 
-// получить volume GUID по букве логического диска
+// РїРѕР»СѓС‡РёС‚СЊ volume GUID РїРѕ Р±СѓРєРІРµ Р»РѕРіРёС‡РµСЃРєРѕРіРѕ РґРёСЃРєР°
 std::wstring GetVolumeGUIDFromDriveLetter(std::wstring driveLetter);
 
-// получить Partition Table
+// РїРѕР»СѓС‡РёС‚СЊ Partition Table
 std::wstring GetPartitionStyle(const DWORD pStyle);
 
-// список GPT атрибутов
+// СЃРїРёСЃРѕРє GPT Р°С‚СЂРёР±СѓС‚РѕРІ
 void GetGPTAttributes(const ULONGLONG attributes, std::vector<std::wstring>& str);
 
-// тип шины
+// С‚РёРї С€РёРЅС‹
 std::wstring GetBusTypeString(const STORAGE_BUS_TYPE busType);
 
-// определение GPT типа раздела
+// РѕРїСЂРµРґРµР»РµРЅРёРµ GPT С‚РёРїР° СЂР°Р·РґРµР»Р°
 std::wstring GetGPTPartitionType(const GUID id);
 
 
-// база строк MBR типа раздела https://en.wikipedia.org/wiki/Partition_type
+// Р±Р°Р·Р° СЃС‚СЂРѕРє MBR С‚РёРїР° СЂР°Р·РґРµР»Р° https://en.wikipedia.org/wiki/Partition_type
 static constexpr const char* const MBRPartitionType[] = {
 	/* 00 */ "[without platform] Empty partition entry",
 	/* 01 */ "[DOS 2.0+] FAT12 file system partition",

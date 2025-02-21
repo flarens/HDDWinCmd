@@ -7,14 +7,14 @@
 #include "functions.h"
 
 
-// извлечь тип MBR раздела из базы строк 
+// РёР·РІР»РµС‡СЊ С‚РёРї MBR СЂР°Р·РґРµР»Р° РёР· Р±Р°Р·С‹ СЃС‚СЂРѕРє 
 std::wstring GetMBRPartitionType(const BYTE id) {
 	if (std::strlen(MBRPartitionType[id]) == 0)  return L"Undefined";
 	return StringToWstring(MBRPartitionType[id]);
 }
 
 
-// заполнить массив привязки логических дисков
+// Р·Р°РїРѕР»РЅРёС‚СЊ РјР°СЃСЃРёРІ РїСЂРёРІСЏР·РєРё Р»РѕРіРёС‡РµСЃРєРёС… РґРёСЃРєРѕРІ
 std::vector<std::wstring> GetDriveLetters() {
 	wchar_t driveStrings[256];
 	DWORD length = GetLogicalDriveStringsW(sizeof(driveStrings) / sizeof(wchar_t), driveStrings);
@@ -28,7 +28,7 @@ std::vector<std::wstring> GetDriveLetters() {
 }
 
 
-// получение полей STORAGE_DEVICE_DESCRIPTOR в строки
+// РїРѕР»СѓС‡РµРЅРёРµ РїРѕР»РµР№ STORAGE_DEVICE_DESCRIPTOR РІ СЃС‚СЂРѕРєРё
 std::wstring GetDescriptorString(BYTE* buffer, const DWORD offset) {
 	if (offset != 0) {
 		char* charcast = reinterpret_cast<char*>(buffer + offset);
@@ -38,7 +38,7 @@ std::wstring GetDescriptorString(BYTE* buffer, const DWORD offset) {
 }
 
 
-// получение информации о диске
+// РїРѕР»СѓС‡РµРЅРёРµ РёРЅС„РѕСЂРјР°С†РёРё Рѕ РґРёСЃРєРµ
 void GetPhysicalDriveInfo(const HANDLE& hDrive, DriveInfo& drive) {
 	BYTE buffer[1024] = { 0 };
 	DWORD bytesReturned = 0;
@@ -58,15 +58,15 @@ void GetPhysicalDriveInfo(const HANDLE& hDrive, DriveInfo& drive) {
 		NULL)) {
 		STORAGE_DEVICE_DESCRIPTOR* descriptor = (STORAGE_DEVICE_DESCRIPTOR*)buffer;
 
-		drive.busType = GetBusTypeString(descriptor->BusType);								// тип шины
-		drive.product = GetDescriptorString(buffer, descriptor->ProductIdOffset);			// имя устройства
-		drive.vendor = GetDescriptorString(buffer, descriptor->VendorIdOffset);				// поставщик
-		drive.revision = GetDescriptorString(buffer, descriptor->ProductRevisionOffset);	// ревизия
-		drive.serial = GetDescriptorString(buffer, descriptor->SerialNumberOffset);			// серийник
-		// извлекаемый
+		drive.busType = GetBusTypeString(descriptor->BusType);								// С‚РёРї С€РёРЅС‹
+		drive.product = GetDescriptorString(buffer, descriptor->ProductIdOffset);			// РёРјСЏ СѓСЃС‚СЂРѕР№СЃС‚РІР°
+		drive.vendor = GetDescriptorString(buffer, descriptor->VendorIdOffset);				// РїРѕСЃС‚Р°РІС‰РёРє
+		drive.revision = GetDescriptorString(buffer, descriptor->ProductRevisionOffset);	// СЂРµРІРёР·РёСЏ
+		drive.serial = GetDescriptorString(buffer, descriptor->SerialNumberOffset);			// СЃРµСЂРёР№РЅРёРє
+		// РёР·РІР»РµРєР°РµРјС‹Р№
 		if (descriptor->RemovableMedia) drive.removable = L"true";
 		else drive.removable = L"false";
-		// очередь команд
+		// РѕС‡РµСЂРµРґСЊ РєРѕРјР°РЅРґ
 		if (descriptor->CommandQueueing) drive.ncq = L"true";
 		else drive.ncq = L"false";
 	}else {
@@ -79,24 +79,24 @@ void GetPhysicalDriveInfo(const HANDLE& hDrive, DriveInfo& drive) {
 }
 
 
-// составить список всех логических дисков
+// СЃРѕСЃС‚Р°РІРёС‚СЊ СЃРїРёСЃРѕРє РІСЃРµС… Р»РѕРіРёС‡РµСЃРєРёС… РґРёСЃРєРѕРІ
 bool GetLogicalVolumes(std::vector<DiskInfo>& logicalDisks) {
 	wchar_t diskGUID[MAX_PATH];
 	HANDLE hFind = FindFirstVolumeW(diskGUID, ARRAYSIZE(diskGUID));
 
 	if (hFind == INVALID_HANDLE_VALUE) {
-		// ошибка вызова FindFirstVolume - GetLastError()
+		// РѕС€РёР±РєР° РІС‹Р·РѕРІР° FindFirstVolume - GetLastError()
 		return false;
 	}
 
 	do {
-		// уберем слеш с конца если есть
+		// СѓР±РµСЂРµРј СЃР»РµС€ СЃ РєРѕРЅС†Р° РµСЃР»Рё РµСЃС‚СЊ
 		size_t len = wcslen(diskGUID);
 		if (len > 0 && diskGUID[len - 1] == L'\\') diskGUID[len - 1] = L'\0';
 
-		// открываем том
+		// РѕС‚РєСЂС‹РІР°РµРј С‚РѕРј
 		HANDLE hVolume = CreateFileW(
-			diskGUID,	// ВАЖНО - без завершающего слеша!!!
+			diskGUID,	// Р’РђР–РќРћ - Р±РµР· Р·Р°РІРµСЂС€Р°СЋС‰РµРіРѕ СЃР»РµС€Р°!!!
 			GENERIC_READ | GENERIC_WRITE,
 			FILE_SHARE_READ | FILE_SHARE_WRITE,
 			nullptr,
@@ -119,12 +119,12 @@ bool GetLogicalVolumes(std::vector<DiskInfo>& logicalDisks) {
 				nullptr)) {
 				for (DWORD i = 0; i < diskExtents.NumberOfDiskExtents; ++i) {
 					DISK_EXTENT& extent = diskExtents.Extents[i];
-					// возвращаем слеш в GUID
+					// РІРѕР·РІСЂР°С‰Р°РµРј СЃР»РµС€ РІ GUID
 					if (len > 0) diskGUID[len - 1] = L'\\';
-					// сохраняем идентификацию тома
+					// СЃРѕС…СЂР°РЅСЏРµРј РёРґРµРЅС‚РёС„РёРєР°С†РёСЋ С‚РѕРјР°
 					logicalDisks.push_back({ extent.DiskNumber, extent.StartingOffset.QuadPart, diskGUID });
 				}
-			}//else {ошибка получения информации о томе}
+			}//else {РѕС€РёР±РєР° РїРѕР»СѓС‡РµРЅРёСЏ РёРЅС„РѕСЂРјР°С†РёРё Рѕ С‚РѕРјРµ}
 		}
 		CloseHandle(hVolume);
 
@@ -135,7 +135,7 @@ bool GetLogicalVolumes(std::vector<DiskInfo>& logicalDisks) {
 }
 
 
-// получить букву диска по volume GUID
+// РїРѕР»СѓС‡РёС‚СЊ Р±СѓРєРІСѓ РґРёСЃРєР° РїРѕ volume GUID
 std::wstring GetDriveLetterFromVolumeGUID(const std::wstring& volumeGUID) {
 	WCHAR volumePath[MAX_PATH + 1] = { 0 };
 
@@ -149,7 +149,7 @@ std::wstring GetDriveLetterFromVolumeGUID(const std::wstring& volumeGUID) {
 		DWORD fileSystemFlags = 0;
 		WCHAR fileSystemName[MAX_PATH + 1] = { 0 };
 
-		// получаем метку тома и файловую систему
+		// РїРѕР»СѓС‡Р°РµРј РјРµС‚РєСѓ С‚РѕРјР° Рё С„Р°Р№Р»РѕРІСѓСЋ СЃРёСЃС‚РµРјСѓ
 		if (GetVolumeInformationW(
 			volumePath,
 			volumeLabel,
@@ -172,12 +172,12 @@ std::wstring GetDriveLetterFromVolumeGUID(const std::wstring& volumeGUID) {
 }
 
 
-// получение геометрии диска
+// РїРѕР»СѓС‡РµРЅРёРµ РіРµРѕРјРµС‚СЂРёРё РґРёСЃРєР°
 void GetDriveGeometry(const HANDLE& hDrive, std::wstring& geometry, std::wstring& size) {
 	DISK_GEOMETRY diskGeometry;
 	DWORD bytesReturned;
 
-	// получаем информацию о диске
+	// РїРѕР»СѓС‡Р°РµРј РёРЅС„РѕСЂРјР°С†РёСЋ Рѕ РґРёСЃРєРµ
 	if (!DeviceIoControl(
 		hDrive,
 		IOCTL_DISK_GET_DRIVE_GEOMETRY,
@@ -197,7 +197,7 @@ void GetDriveGeometry(const HANDLE& hDrive, std::wstring& geometry, std::wstring
 		L"; SectorsPerTrack=" + std::to_wstring(diskGeometry.SectorsPerTrack) +
 		L"; BytesPerSector=" + std::to_wstring(diskGeometry.BytesPerSector);
 
-	// вычисляем полный размер диска
+	// РІС‹С‡РёСЃР»СЏРµРј РїРѕР»РЅС‹Р№ СЂР°Р·РјРµСЂ РґРёСЃРєР°
 	LONGLONG diskSize;
 	diskSize = diskGeometry.Cylinders.QuadPart *
 		diskGeometry.TracksPerCylinder *
@@ -208,10 +208,10 @@ void GetDriveGeometry(const HANDLE& hDrive, std::wstring& geometry, std::wstring
 }
 
 
-// получить путь диска по его номеру в системе
+// РїРѕР»СѓС‡РёС‚СЊ РїСѓС‚СЊ РґРёСЃРєР° РїРѕ РµРіРѕ РЅРѕРјРµСЂСѓ РІ СЃРёСЃС‚РµРјРµ
 std::wstring GetPermanentDevicePathByDeviceNumber(int deviceNumber) {
 
-	// получаем список всех устройств класса дисков
+	// РїРѕР»СѓС‡Р°РµРј СЃРїРёСЃРѕРє РІСЃРµС… СѓСЃС‚СЂРѕР№СЃС‚РІ РєР»Р°СЃСЃР° РґРёСЃРєРѕРІ
 	HDEVINFO hDevInfo = SetupDiGetClassDevs(
 		&GUID_DEVINTERFACE_DISK,
 		NULL,
@@ -230,7 +230,7 @@ std::wstring GetPermanentDevicePathByDeviceNumber(int deviceNumber) {
 	while (SetupDiEnumDeviceInterfaces(hDevInfo, NULL, &GUID_DEVINTERFACE_DISK, index, &deviceInterfaceData)) {
 		index++;
 
-		// получаем размер буфера для деталей интерфейса
+		// РїРѕР»СѓС‡Р°РµРј СЂР°Р·РјРµСЂ Р±СѓС„РµСЂР° РґР»СЏ РґРµС‚Р°Р»РµР№ РёРЅС‚РµСЂС„РµР№СЃР°
 		DWORD requiredSize = 0;
 		SetupDiGetDeviceInterfaceDetail(hDevInfo, &deviceInterfaceData, NULL, 0, &requiredSize, NULL);
 
@@ -241,12 +241,12 @@ std::wstring GetPermanentDevicePathByDeviceNumber(int deviceNumber) {
 		SP_DEVINFO_DATA devInfoData = {};
 		devInfoData.cbSize = sizeof(SP_DEVINFO_DATA);
 
-		// получаем детали интерфейса
+		// РїРѕР»СѓС‡Р°РµРј РґРµС‚Р°Р»Рё РёРЅС‚РµСЂС„РµР№СЃР°
 		if (!SetupDiGetDeviceInterfaceDetail(hDevInfo, &deviceInterfaceData, deviceInterfaceDetailData, requiredSize, NULL, &devInfoData)) {
 			continue;
 		}
 
-		// открываем диск
+		// РѕС‚РєСЂС‹РІР°РµРј РґРёСЃРє
 		HANDLE hDrive = CreateFileW(
 			deviceInterfaceDetailData->DevicePath,
 			GENERIC_READ,
@@ -257,12 +257,12 @@ std::wstring GetPermanentDevicePathByDeviceNumber(int deviceNumber) {
 			NULL
 		);
 
-		// если диск не найден
+		// РµСЃР»Рё РґРёСЃРє РЅРµ РЅР°Р№РґРµРЅ
 		if (hDrive == INVALID_HANDLE_VALUE) {
 			continue;
 		}
 
-		// получение номера диска и путей
+		// РїРѕР»СѓС‡РµРЅРёРµ РЅРѕРјРµСЂР° РґРёСЃРєР° Рё РїСѓС‚РµР№
 		int number = GetDriveNumber(hDrive);
 
 		if (number == deviceNumber) {
@@ -276,10 +276,10 @@ std::wstring GetPermanentDevicePathByDeviceNumber(int deviceNumber) {
 }
 
 
-// получить список дисков
+// РїРѕР»СѓС‡РёС‚СЊ СЃРїРёСЃРѕРє РґРёСЃРєРѕРІ
 void GetPhysicalDrivesList(bool maxinfo, s_resp& resp) {
 
-	// получаем список всех устройств класса дисков
+	// РїРѕР»СѓС‡Р°РµРј СЃРїРёСЃРѕРє РІСЃРµС… СѓСЃС‚СЂРѕР№СЃС‚РІ РєР»Р°СЃСЃР° РґРёСЃРєРѕРІ
 	HDEVINFO hDevInfo = SetupDiGetClassDevs(
 		&GUID_DEVINTERFACE_DISK,
 		NULL,
@@ -292,7 +292,7 @@ void GetPhysicalDrivesList(bool maxinfo, s_resp& resp) {
 		return;
 	}
 
-	// получим соответствия дисков и их guid
+	// РїРѕР»СѓС‡РёРј СЃРѕРѕС‚РІРµС‚СЃС‚РІРёСЏ РґРёСЃРєРѕРІ Рё РёС… guid
 	std::vector<DiskInfo> logicalDisks;
 	GetLogicalVolumes(logicalDisks);
 
@@ -305,7 +305,7 @@ void GetPhysicalDrivesList(bool maxinfo, s_resp& resp) {
 	while (SetupDiEnumDeviceInterfaces(hDevInfo, NULL, &GUID_DEVINTERFACE_DISK, index, &deviceInterfaceData)) {
 		index++;
 
-		// получаем размер буфера для деталей интерфейса
+		// РїРѕР»СѓС‡Р°РµРј СЂР°Р·РјРµСЂ Р±СѓС„РµСЂР° РґР»СЏ РґРµС‚Р°Р»РµР№ РёРЅС‚РµСЂС„РµР№СЃР°
 		DWORD requiredSize = 0;
 		SetupDiGetDeviceInterfaceDetail(hDevInfo, &deviceInterfaceData, NULL, 0, &requiredSize, NULL);
 
@@ -316,7 +316,7 @@ void GetPhysicalDrivesList(bool maxinfo, s_resp& resp) {
 		SP_DEVINFO_DATA devInfoData = {};
 		devInfoData.cbSize = sizeof(SP_DEVINFO_DATA);
 
-		// получаем детали интерфейса
+		// РїРѕР»СѓС‡Р°РµРј РґРµС‚Р°Р»Рё РёРЅС‚РµСЂС„РµР№СЃР°
 		if (!SetupDiGetDeviceInterfaceDetail(hDevInfo, &deviceInterfaceData, deviceInterfaceDetailData, requiredSize, NULL, &devInfoData)) {
 			WcoutExt_Mini(L"Error getting interface details for disk " + std::to_wstring(index) + L". " + GetLastErrorString() + L"\r\n", resp, false);
 			continue;
@@ -333,16 +333,16 @@ void GetPhysicalDrivesList(bool maxinfo, s_resp& resp) {
 }
 
 
-// получить информацию о диске
+// РїРѕР»СѓС‡РёС‚СЊ РёРЅС„РѕСЂРјР°С†РёСЋ Рѕ РґРёСЃРєРµ
 bool GetPhysicalDrive(const std::wstring& devicePath, std::vector<DiskInfo>& logicalDisks, const bool maxinfo, s_resp& resp, const bool single_source) {
 
-	// открываем диск
+	// РѕС‚РєСЂС‹РІР°РµРј РґРёСЃРє
 	HANDLE hDevice;
 	if (!OpenDevice(hDevice, devicePath, resp)) {
 		return false;
 	}
 
-	// получение номера диска и путей
+	// РїРѕР»СѓС‡РµРЅРёРµ РЅРѕРјРµСЂР° РґРёСЃРєР° Рё РїСѓС‚РµР№
 	int deviceNumber = GetDriveNumber(hDevice);
 	if (deviceNumber == -1) {
 		WcoutExt_Mini(L"\r\n======== DRIVE ? ========\r\nFailed to get the device number. " + GetLastErrorString() + L"\r\n", resp, true);
@@ -359,7 +359,7 @@ bool GetPhysicalDrive(const std::wstring& devicePath, std::vector<DiskInfo>& log
 	}
 	if (!single_source) WcoutExt_Mini(L"permanent device path:\r\n" + devicePath + L"\r\n\r\n", resp, true);
 
-	// инфо о диске
+	// РёРЅС„Рѕ Рѕ РґРёСЃРєРµ
 	DriveInfo drive;
 	GetPhysicalDriveInfo(hDevice, drive);
 	WcoutExt_Mini(L"  bus type: " + drive.busType + L"\r\n", resp, true);
@@ -372,7 +372,7 @@ bool GetPhysicalDrive(const std::wstring& devicePath, std::vector<DiskInfo>& log
 		WcoutExt_Mini(L"  command queue support (NCQ): " + drive.ncq + L"\r\n", resp, true);
 	}
 
-	// геометрия диска
+	// РіРµРѕРјРµС‚СЂРёСЏ РґРёСЃРєР°
 	std::wstring dGeometry;
 	std::wstring dSize;
 	GetDriveGeometry(hDevice, dGeometry, dSize);
@@ -382,7 +382,7 @@ bool GetPhysicalDrive(const std::wstring& devicePath, std::vector<DiskInfo>& log
 	BYTE buffer[1024] = { 0 };
 	DWORD bytesReturned = 0;
 
-	// получение схемы логических дисков
+	// РїРѕР»СѓС‡РµРЅРёРµ СЃС…РµРјС‹ Р»РѕРіРёС‡РµСЃРєРёС… РґРёСЃРєРѕРІ
 	if (!DeviceIoControl(
 		hDevice,
 		IOCTL_DISK_GET_DRIVE_LAYOUT_EX,
@@ -398,7 +398,7 @@ bool GetPhysicalDrive(const std::wstring& devicePath, std::vector<DiskInfo>& log
 	}
 	DRIVE_LAYOUT_INFORMATION_EX* driveLayout = (DRIVE_LAYOUT_INFORMATION_EX*)buffer;
 
-	// получить Partition Table
+	// РїРѕР»СѓС‡РёС‚СЊ Partition Table
 	if (maxinfo) WcoutExt_Mini(L"  partition table: " + GetPartitionStyle(driveLayout->PartitionStyle) + L"\r\n", resp, true);
 
 	WcoutExt_Mini(L"  partitions: " + std::to_wstring(driveLayout->PartitionCount) + L"\r\n", resp, true);
@@ -415,7 +415,7 @@ bool GetPhysicalDrive(const std::wstring& devicePath, std::vector<DiskInfo>& log
 				WcoutExt_Mini(L"    GPT partition GUID: " + GUIDtoString(partition.Gpt.PartitionId) + L"\r\n", resp, true);
 			}
 
-			// поиск связки с логическим томом
+			// РїРѕРёСЃРє СЃРІСЏР·РєРё СЃ Р»РѕРіРёС‡РµСЃРєРёРј С‚РѕРјРѕРј
 			for (const auto& disk : logicalDisks) {
 				if (disk.PhysicalDriveNumber == deviceNumber && disk.StartingOffset == partition.StartingOffset.QuadPart) {
 					if (maxinfo) WcoutExt_Mini(L"    volume GUID path: " + disk.GUID + L"\r\n", resp, true);
@@ -433,22 +433,22 @@ bool GetPhysicalDrive(const std::wstring& devicePath, std::vector<DiskInfo>& log
 			WcoutExt_Mini(L"    size: " + std::to_wstring(partition.PartitionLength.QuadPart) + L" bytes (~ " + BytesToFormatString(partition.PartitionLength.QuadPart) + L")\r\n", resp, true);
 
 			if (maxinfo && driveLayout->PartitionStyle == PARTITION_STYLE_MBR) {
-				// тип партиции
+				// С‚РёРї РїР°СЂС‚РёС†РёРё
 				WcoutExt_Mini(L"    MBR partition type: " + GetMBRPartitionType(partition.Mbr.PartitionType) + L"\r\n", resp, true);
-				// загрузочный или нет
+				// Р·Р°РіСЂСѓР·РѕС‡РЅС‹Р№ РёР»Рё РЅРµС‚
 				WcoutExt_Mini(L"    MBR boot partition: ", resp, true);
 				if (partition.Mbr.BootIndicator) WcoutExt_Mini(L"true\r\n", resp, true);
 				else WcoutExt_Mini(L"false\r\n", resp, true);
 			}
 
 			if (maxinfo && driveLayout->PartitionStyle == PARTITION_STYLE_GPT) {
-				// тип партиции
+				// С‚РёРї РїР°СЂС‚РёС†РёРё
 				WcoutExt_Mini(L"    GPT partition type: " + GetGPTPartitionType(partition.Gpt.PartitionType) + L"\r\n", resp, true);
-				// имя партиции
+				// РёРјСЏ РїР°СЂС‚РёС†РёРё
 				std::wstring wideName(partition.Gpt.Name);
 				std::wstring partitionName(wideName.begin(), wideName.end());
 				WcoutExt_Mini(L"    GPT partition name: " + partitionName + L"\r\n", resp, true);
-				// список GPT атрибутов
+				// СЃРїРёСЃРѕРє GPT Р°С‚СЂРёР±СѓС‚РѕРІ
 				std::vector<std::wstring> attrstr;
 				GetGPTAttributes(partition.Gpt.Attributes, attrstr);
 				WcoutExt_Mini(L"    GPT attributes:\r\n", resp, true);
@@ -466,7 +466,7 @@ bool GetPhysicalDrive(const std::wstring& devicePath, std::vector<DiskInfo>& log
 }
 
 
-// получить volume GUID по букве логического диска
+// РїРѕР»СѓС‡РёС‚СЊ volume GUID РїРѕ Р±СѓРєРІРµ Р»РѕРіРёС‡РµСЃРєРѕРіРѕ РґРёСЃРєР°
 std::wstring GetVolumeGUIDFromDriveLetter(std::wstring driveLetter) {
 	driveLetter = driveLetter + L":\\";
 
@@ -479,7 +479,7 @@ std::wstring GetVolumeGUIDFromDriveLetter(std::wstring driveLetter) {
 }
 
 
-// получить Partition Table
+// РїРѕР»СѓС‡РёС‚СЊ Partition Table
 std::wstring GetPartitionStyle(const DWORD pStyle) {
 	switch (pStyle) {
 	case PARTITION_STYLE_MBR:
@@ -493,7 +493,7 @@ std::wstring GetPartitionStyle(const DWORD pStyle) {
 }
 
 
-// список GPT атрибутов
+// СЃРїРёСЃРѕРє GPT Р°С‚СЂРёР±СѓС‚РѕРІ
 void GetGPTAttributes(const ULONGLONG attributes, std::vector<std::wstring>& str) {
 	if (attributes & GPT_ATTRIBUTE_PLATFORM_REQUIRED) str.push_back(L"+ Platform required [active]");
 	else str.push_back(L"- Platform required [NOT]");
@@ -512,7 +512,7 @@ void GetGPTAttributes(const ULONGLONG attributes, std::vector<std::wstring>& str
 }
 
 
-// тип шины
+// С‚РёРї С€РёРЅС‹
 std::wstring GetBusTypeString(const STORAGE_BUS_TYPE busType) {
 	switch (busType) {
 	case 0x00: return L"Unknown";
@@ -543,9 +543,9 @@ std::wstring GetBusTypeString(const STORAGE_BUS_TYPE busType) {
 }
 
 
-// определение GPT типа раздела https://ru.wikipedia.org/wiki/Таблица_разделов_GUID
+// РѕРїСЂРµРґРµР»РµРЅРёРµ GPT С‚РёРїР° СЂР°Р·РґРµР»Р° https://ru.wikipedia.org/wiki/РўР°Р±Р»РёС†Р°_СЂР°Р·РґРµР»РѕРІ_GUID
 std::wstring GetGPTPartitionType(const GUID id) {
-	// без платформы
+	// Р±РµР· РїР»Р°С‚С„РѕСЂРјС‹
 	if (IsEqualGUID(id, { 0x00000000, 0x0000, 0x0000,{ 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 } })) return L"[without platform] Unused data record";
 	else if (IsEqualGUID(id, { 0x024DEE41, 0x33E7, 0x11D3,{ 0x9D, 0x69, 0x00, 0x08, 0xC7, 0x81, 0xF3, 0x9F } })) return L"[without platform] MBR partition scheme";
 	else if (IsEqualGUID(id, { 0xC12A7328, 0xF81F, 0x11D2,{ 0xBA, 0x4B, 0x00, 0xA0, 0xC9, 0x3E, 0xC9, 0x3B } })) return L"[without platform] EFI system partition";
@@ -613,7 +613,7 @@ std::wstring GetGPTPartitionType(const GUID id) {
 	else if (IsEqualGUID(id, { 0xFE3A2A5D, 0x4F32, 0x41A7,{ 0xB7, 0x25, 0xAC, 0xCC, 0x32, 0x85, 0xA3, 0x09 } })) return L"[Chrome OS] Kernel";
 	else if (IsEqualGUID(id, { 0x3CB8E202, 0x3B7E, 0x47DD,{ 0x8A, 0x3C, 0x7F, 0xF2, 0xA1, 0x3C, 0xFC, 0xEC } })) return L"[Chrome OS] Rootfs";
 	else if (IsEqualGUID(id, { 0x2E0A753D, 0x9E48, 0x43B0,{ 0x83, 0x37, 0xB1, 0x51, 0x92, 0xCB, 0x1B, 0x5E } })) return L"[Chrome OS] For future reference";
-	// другие
+	// РґСЂСѓРіРёРµ
 	else if (IsEqualGUID(id, { 0x75894C1E, 0x3AEB, 0x11D3,{ 0xB7, 0xC1, 0x7B, 0x03, 0xA0, 0x00, 0x00, 0x00 } })) return L"[HP-UX] Data partition";
 	else if (IsEqualGUID(id, { 0xE2A1E728, 0x32E3, 0x11D6,{ 0xA6, 0x82, 0x7B, 0x03, 0xA0, 0x00, 0x00, 0x00 } })) return L"[HP-UX] Service partition";
 	else if (IsEqualGUID(id, { 0xCEF5A9AD, 0x73BC, 0x4601,{ 0x89, 0xF3, 0xCD, 0xEE, 0xEE, 0xE3, 0x21, 0xA1 } })) return L"[QNX] Power-safe (QNX6) file system";

@@ -1,6 +1,6 @@
 #pragma once
 
-// âåğñèş òàêæå îáíîâëÿòü â version.rc
+// Ğ²ĞµÑ€ÑĞ¸Ñ Ñ‚Ğ°ĞºĞ¶Ğµ Ğ¾Ğ±Ğ½Ğ¾Ğ²Ğ»ÑÑ‚ÑŒ Ğ² version.rc
 
 static const wchar_t helpText[] = LR"(======================
 === HDDWinCmd v0.1 ===
@@ -16,7 +16,7 @@ static const wchar_t helpText[] = LR"(======================
 - If a parameter contains spaces, it must be wrapped with double quotes.
 - If a command requires additional parameters, they must be executed before it (left).
 
-[Ñommands:]
+[Ğ¡ommands:]
 
 --help (or --h or uncommanded run) - command list (this page)
 
@@ -55,7 +55,7 @@ static const wchar_t helpText[] = LR"(======================
 --plug [state] [flags] (or --p) - disconnect/connect disk to the system (not stop)
     requires:
      --disk - destination disk
-     --timeout (optional) - waiting time for disk operations to complete (used if “force” flag is not set)
+     --timeout (optional) - waiting time for disk operations to complete (used if â€œforceâ€ flag is not set)
     states:
      0 (or offline) - go offline
      1 (or online) - go online

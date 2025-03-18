@@ -2,9 +2,9 @@
 
 // версию также обновлять в version.rc
 
-static const wchar_t helpText[] = LR"(======================
-=== HDDWinCmd v0.2 ===
-======================
+static const wchar_t helpText[] = LR"(========================
+=== HDDWinCmd v0.2.1 ===
+========================
 
 [Command structure:]
 
@@ -56,7 +56,7 @@ static const wchar_t helpText[] = LR"(======================
 --plug [state] [flags] (or --p) - disconnect/connect disk to the system (not stop)
     requires:
      --disk - destination disk
-     --timeout (optional) - waiting time for disk operations to complete (used if “force” flag is not set)
+     --timeout (optional) - waiting time for disk operations to complete (used if [force] flag is not set)
     states:
      0 (or offline) - go offline
      1 (or online) - go online

@@ -12,9 +12,9 @@
 
 **Информация о дисковом устройстве:** путь к диску, тип шины, имя продукта и поставщика, версия, серийный номер, возможность извлечения, поддержка NCQ, геометрия диска, размер, тип таблицы разделов
 
-**Информация о логическом томе:** GPT GUID, volume GUID, буква диска, метка тома, файловая система, start LBA, размер, тип и имя партиции, GPT атрибуты
+**Информация о логическом томе:** GPT GUID, volume GUID, точки монтирования, файловая система, метка тома, start LBA, размер, тип и имя партиции, GPT атрибуты
 
-![screenshot](https://github.com/flarens/HDDWinCmd/blob/main/screenshot2.png)
+![screenshot](https://github.com/flarens/HDDWinCmd/blob/main/screenshot_v0.3.png)
 
 ## Структура команд:
 
@@ -30,7 +30,7 @@
 
 ---
 
-`--disk [path]` (или `--d`) - **задать путь к диску** (permanent / temporary Windows / temporary Linux / volume GUID / drive letter / physical drive number)
+`--disk [path]` (или `--d`) - **задать путь к диску** (deviceID / devicePath / volume GUID / drive letter / physical drive number / folder path)
 
 > *примеры:*
 
@@ -39,6 +39,13 @@
     --disk 0
     --d /dev/sda
     --d C
+    --d C:\share\symlink_HDD_12\NAS
+
+> *комментарий:*
+
+Рекомендуется использовать перманентные идентификаторы - они сохранятся при изменении конфигурации оборудования.
+
+Диск можно указать через путь к папке/файлу, содержащий точки монтирования и символические ссылки.
 
 ---
 

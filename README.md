@@ -1,6 +1,3 @@
-[![GitHub Release](https://img.shields.io/github/v/release/flarens/HDDWinCmd?style=flat&logo=github)](https://github.com/flarens/HDDWinCmd/releases)
-[![GitHub Downloads](https://img.shields.io/github/downloads/flarens/HDDWinCmd/total?style=flat&logo=github)](https://github.com/flarens/HDDWinCmd/releases)
-
 # HDDWinCmd
 
 **Платформа:** Windows
